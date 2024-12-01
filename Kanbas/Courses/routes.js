@@ -3,6 +3,7 @@ import * as modulesDao from "../Modules/dao.js";
 import * as assignmentsDao from "../Assignments/dao.js";
 import * as enrollmentsDao from "../Enrollments/dao.js";
 import * as coursesDao from "./dao.js";
+import * as quizDao from "../Quizzes/dao.js";
 
 export default function CourseRoutes(app) {
   app.get("/api/courses", (req, res) => {
@@ -30,6 +31,25 @@ export default function CourseRoutes(app) {
     };
     const newAssignment = assignmentsDao.createAssignment(assignment);
     res.send(newAssignment);
+  });
+
+  // Displaying quizzes to the user.
+  app.get("/api/courses/:courseId/Quizzes", (req, res) => {
+    console.log("Inside server");
+    const { courseId } = req.params;
+    const quizzes = quizDao.findQuizzes(courseId);
+    res.json(quizzes);
+  });
+
+  // Creating new Quizzes.
+  app.post("/api/courses/:courseId/Quizzes", (req, res) => {
+    const { courseId } = req.params;
+    const quiz = {
+      ...req.body,
+      course: courseId,
+    };
+    const newQuiz = quizDao.createQuiz(quiz);
+    res.send(newQuiz);
   });
 
   app.post("/api/courses/:courseId/modules", (req, res) => {
