@@ -40,7 +40,7 @@ export const createQuiz = (quiz) => {
 export const updateQuiz = (quizId, updatedQuiz) => {
   const { quizzes } = Database;
   const quiz = quizzes.find((quiz) => quiz._id === quizId);
-
+  console.log(quiz);
   Object.assign(quiz, updatedQuiz);
   return quiz;
 };

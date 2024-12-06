@@ -6,9 +6,26 @@ import * as coursesDao from "./dao.js";
 import * as quizDao from "../Quizzes/dao.js";
 
 export default function CourseRoutes(app) {
-  app.get("/api/courses", (req, res) => {
-    const courses = enrollmentsDao.findAllCourses();
-    res.json(courses);
+  const findUsersForCourse = async (req, res) => {
+    const { cid } = req.params;
+    const users = await enrollmentsDao.findUsersForCourse(cid);
+    res.json(users);
+  };
+  app.get("/api/courses/:cid/users", findUsersForCourse);
+
+  app.post("/api/courses", async (req, res) => {
+    const course = await dao.createCourse(req.body);
+    const currentUser = req.session["currentUser"];
+    if (currentUser) {
+      await enrollmentsDao.enrollUserInCourse(currentUser._id, course._id);
+    }
+
+    res.json(course);
+  });
+
+  app.get("/api/courses", async (req, res) => {
+    const courses = await dao.findAllCourses();
+    res.send(courses);
   });
   // app.get("/api/Dashboard/enrollments", (req, res) => {
   //   const courses = enrollmentsDao.findAllCourses();
@@ -16,20 +33,20 @@ export default function CourseRoutes(app) {
   // });
 
   // Getting the assignment to display to the user.
-  app.get("/api/courses/:courseId/Assignments", (req, res) => {
+  app.get("/api/courses/:courseId/Assignments", async (req, res) => {
     const { courseId } = req.params;
-    const assignments = assignmentsDao.findAssignmentsForCourse(courseId);
+    const assignments = await assignmentsDao.findAssignmentsForCourse(courseId);
     res.json(assignments);
   });
 
   // Creating a new assignment.
-  app.post("/api/courses/:courseId/Assignments", (req, res) => {
+  app.post("/api/courses/:courseId/Assignments", async (req, res) => {
     const { courseId } = req.params;
     const assignment = {
       ...req.body,
       course: courseId,
     };
-    const newAssignment = assignmentsDao.createAssignment(assignment);
+    const newAssignment = await assignmentsDao.createAssignment(assignment);
     res.send(newAssignment);
   });
 
@@ -52,32 +69,32 @@ export default function CourseRoutes(app) {
     res.send(newQuiz);
   });
 
-  app.post("/api/courses/:courseId/modules", (req, res) => {
+  app.post("/api/courses/:courseId/modules", async (req, res) => {
     const { courseId } = req.params;
     const module = {
       ...req.body,
       course: courseId,
     };
-    const newModule = modulesDao.createModule(module);
+    const newModule = await modulesDao.createModule(module);
     res.send(newModule);
   });
 
-  app.delete("/api/courses/:courseId", (req, res) => {
+  app.delete("/api/courses/:courseId", async (req, res) => {
     const { courseId } = req.params;
-    const courses = coursesDao.deleteCourse(courseId);
-    res.json(courses);
+    const status = await coursesDao.deleteCourse(courseId);
+    res.send(status);
   });
 
-  app.get("/api/courses/:courseId/modules", (req, res) => {
+  app.get("/api/courses/:courseId/modules", async (req, res) => {
     const { courseId } = req.params;
-    const modules = modulesDao.findModulesForCourse(courseId);
+    const modules = await modulesDao.findModulesForCourse(courseId);
     res.json(modules);
   });
 
-  app.put("/api/courses/:courseId", (req, res) => {
+  app.put("/api/courses/:courseId", async (req, res) => {
     const { courseId } = req.params;
     const courseUpdates = req.body;
-    const status = dao.updateCourse(courseId, courseUpdates);
+    const status = await dao.updateCourse(courseId, courseUpdates);
     res.send(status);
   });
 }

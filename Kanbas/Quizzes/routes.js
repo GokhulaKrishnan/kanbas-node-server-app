@@ -5,8 +5,8 @@ export default function QuizRoutes(app) {
   app.put("/api/Quizzes/:quizId", (req, res) => {
     const { quizId } = req.params;
     const quizUpdates = req.body;
-    console.log("reached", assignmentId);
-    console.log("reached", assignmentUpdates);
+    // console.log("reached", assignmentId);
+    // console.log("reached", assignmentUpdates);
 
     const status = quizzesDao.updateQuiz(quizId, quizUpdates);
     res.send(status);
