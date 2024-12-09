@@ -17,6 +17,7 @@ const schema = new mongoose.Schema(
 
     time: Number,
     multipleAttempts: Boolean,
+    attempts: Number,
     published: Boolean,
     description: String,
     questions: [{ String }],
