@@ -51,21 +51,22 @@ export default function CourseRoutes(app) {
   });
 
   // Displaying quizzes to the user.
-  app.get("/api/courses/:courseId/Quizzes", (req, res) => {
+  app.get("/api/courses/:courseId/Quizzes", async (req, res) => {
     console.log("Inside server");
     const { courseId } = req.params;
-    const quizzes = quizDao.findQuizzes(courseId);
+    console.log(courseId);
+    const quizzes = await quizDao.findQuizzes(courseId);
     res.json(quizzes);
   });
 
   // Creating new Quizzes.
-  app.post("/api/courses/:courseId/Quizzes", (req, res) => {
+  app.post("/api/courses/:courseId/Quizzes", async (req, res) => {
     const { courseId } = req.params;
     const quiz = {
       ...req.body,
-      course: courseId,
+      courseId: courseId,
     };
-    const newQuiz = quizDao.createQuiz(quiz);
+    const newQuiz = await quizDao.createQuiz(quiz);
     res.send(newQuiz);
   });
 
